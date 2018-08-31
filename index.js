@@ -5,6 +5,7 @@ var BearerStrategy = require('passport-azure-ad').BearerStrategy;
 var leaves = require('./core/leaves');
 var compression = require('compression');
 bodyParser = require('body-parser');
+var ideas = require("./core/ideabox")
 
 var options = {
     identityMetadata: "https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration/",
@@ -124,8 +125,34 @@ app.get('/api/issues',passport.authenticate('oauth-bearer', {session: false}), (
        
   } 
   );
-
-
+  app.get('/api/ideabox',  (req, res) => {
+    var userid = req.query['userid']
+    console.log(userid)
+    ideas.getAllIdeas(userid).then((Response)=>{
+        res.json(Response)
+    }).catch((error)=>{
+        res.json(error)
+    })
+ 
+  }
+  );
+  app.post('/api/ideabox',   async (req, res) => {
+    var input = req.body;
+ 
+    console.log("input111",input)
+  ideas.saveideas(input).then((Response)=>{
+      // res.json(Response)
+      console.log("Response",Response);
+      res.send({
+          status:200,
+          message:"Your Ideas has been posted successfully"
+      })
+  }).catch((error)=>{
+      res.json(error)
+  })
+ 
+ }
+ );
   
   //deletes a leave record
   // method DELETE
