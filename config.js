@@ -1,3 +1,4 @@
+
 exports.creds = {
   // Required
   //identityMetadata: 'https://login.microsoftonline.com/organisation.onmicrosoft.com/v2.0/.well-known/openid-configuration', 
@@ -82,3 +83,4 @@ exports.databaseUri = 'mongodb://nodeadmin:nodeadmin123@ds125181.mlab.com:25181/
 
 // How long you want to keep session in mongoDB.
 exports.mongoDBSessionMaxAge = 24 * 60 * 60;  // 1 day (unit is second)
+

@@ -3,9 +3,12 @@ var morgan = require("morgan");
 var passport = require("passport");
 var BearerStrategy = require('passport-azure-ad').BearerStrategy;
 var leaves = require('./core/leaves');
+var ideas = require('./core/ideabox');
+var user = require('./core/user');
 var compression = require('compression');
 bodyParser = require('body-parser');
-var ideas = require("./core/ideabox")
+var ideas = require("./core/ideabox");
+var dateFormat = require('dateformat');
 
 var options = {
     identityMetadata: "https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration/",
@@ -105,17 +108,15 @@ app.get('/api/issues',passport.authenticate('oauth-bearer', {session: false}), (
    
    
     req.body.selectedRange.end = new Date(req.body.selectedRange.end).toString();
+   
       var input = req.body;
+
       console.log("input111",input)
     leaves.saveLeave(input).then((Response)=>{
         // res.json(Response)
         console.log("Response",Response)
 
-       
-   
-
-
-        res.send({
+            res.send({
             res:Response,
             message:"Your leave request has been saved successfully"
         })
@@ -125,48 +126,60 @@ app.get('/api/issues',passport.authenticate('oauth-bearer', {session: false}), (
        
   } 
   );
-  app.get('/api/ideabox',  (req, res) => {
-    var userid = req.query['userid']
-    console.log(userid)
-    ideas.getAllIdeas(userid).then((Response)=>{
-        res.json(Response)
-    }).catch((error)=>{
-        res.json(error)
-    })
+
  
-  }
-  );
+  
+  //deletes a leave record
+  // method DELETE
+  
+  app.delete('/api/leaves/:id',   passport.authenticate('oauth-bearer', {session: false}),  (req, res) => {
+    
+   
+    res.status(200).send("todo");    
+  } 
+  )
+
+  //saves a ideabox details
+  // method POST
+  //status - complete
   app.post('/api/ideabox',   async (req, res) => {
     var input = req.body;
- 
+
     console.log("input111",input)
   ideas.saveideas(input).then((Response)=>{
       // res.json(Response)
       console.log("Response",Response);
       res.send({
-          status:200,
-          message:"Your Ideas has been posted successfully"
+          res:Response,
+          message:"Your ideas has been saved successfully"
       })
   }).catch((error)=>{
       res.json(error)
   })
- 
- }
- );
-  
-  //deletes a leave record
-  // method DELETE
-  passport.authenticate('oauth-bearer', {session: false})
-  app.delete('/api/leaves/:id',  (req, res) => {
+     
+} 
+);
+  //retrieves all ideas from users
+  app.get('/api/ideabox',  (req, res) => {
+   
+    ideas.getAllIdeas().then((Response)=>{
+        res.json(Response)
+        console.log("res",Response)
+    }).catch((error)=>{
+        res.json(error)
+    })
     
-    var userJson = req.body.user;
-    var leaveRecordJson = req.body.leaves.leaveRecord;
-    var leavesJson = req.body.leaves;
-    leaves.saveLeave(userJson, leavesJson, leaveRecordJson)
-    res.status(200).send(data);    
   } 
   );
+  app.get('/api/employees',async (req, res)=>{
 
+    var email = req.query['email']
+    
+    
+    var employee = await user.findbyMail(email)
+    res.json(employee)
+
+  })
 /**************************************APIs - end*******************************************/
 
 var port = process.env.PORT || 3000;
